@@ -9,6 +9,7 @@ import java.util.List;
 public interface StatsService {
 
     EndpointHit createHit(EndpointHit endpointHit);
+
     List<ViewStats> getStats(Timestamp start, Timestamp end, List<String> uris, boolean unique);
 
 }
