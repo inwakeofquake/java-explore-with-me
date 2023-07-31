@@ -19,7 +19,6 @@ public class EndpointHitRequestDto {
     @NotBlank(message = "ip cannot be blank")
     private String ip;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @NotBlank(message = "timestamp cannot be blank")
     private Timestamp timestamp;
 
 }
