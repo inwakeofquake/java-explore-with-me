@@ -8,18 +8,18 @@ import ru.practicum.entity.ViewStats;
 import ru.practicum.repository.StatsRepository;
 
 import javax.transaction.Transactional;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class StatsServiceImpl implements StatsService {
 
     private final StatsRepository statsRepository;
 
     @Override
+    @Transactional
     public EndpointHit createHit(EndpointHit endpointHit) {
         log.info("Creating hit for endpoint: {}", endpointHit);
         EndpointHit result = statsRepository.save(endpointHit);
@@ -28,7 +28,7 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public List<ViewStats> getStats(Timestamp start, Timestamp end, List<String> uris, boolean unique) {
+    public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         log.info("Retrieving stats for the period from: {} to: {} for uris: {} with unique flag: {}",
                 start, end, uris, unique);
         List<ViewStats> stats;

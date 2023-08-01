@@ -3,7 +3,7 @@ package ru.practicum.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -19,5 +19,5 @@ public class EndpointHit {
     private String app;
     private String uri;
     private String ip;
-    private Timestamp timestamp;
+    private LocalDateTime localDateTime;
 }
