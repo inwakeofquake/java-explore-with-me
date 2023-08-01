@@ -31,9 +31,17 @@ public class StatsServiceImpl implements StatsService {
         log.info("Retrieving stats for the period from: {} to: {} for uris: {} with unique flag: {}", start, end, uris, unique);
         List<ViewStats> stats;
         if (Boolean.TRUE.equals(unique)) {
-            stats = statsRepository.findStatsByDatesUniqueIp(start, end, uris);
+            if (uris == null) {
+                stats = statsRepository.findStatsByDatesUniqueIp(start, end);
+            } else {
+                stats = statsRepository.findStatsByDatesUniqueIp(start, end, uris);
+            }
         } else {
-            stats = statsRepository.findStatsByDates(start, end, uris);
+            if (uris == null) {
+                stats = statsRepository.findStatsByDates(start, end);
+            } else {
+                stats = statsRepository.findStatsByDates(start, end, uris);
+            }
         }
         log.info("Stats retrieved successfully for the period from: {} to: {} for uris: {} with unique flag: {}", start, end, uris, unique);
         return stats;
