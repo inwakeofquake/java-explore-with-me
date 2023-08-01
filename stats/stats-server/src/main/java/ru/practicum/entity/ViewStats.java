@@ -2,7 +2,8 @@ package ru.practicum.entity;
 
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

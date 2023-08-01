@@ -1,6 +1,7 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.entity.EndpointHit;
 import ru.practicum.entity.ViewStats;
@@ -8,8 +9,6 @@ import ru.practicum.repository.StatsRepository;
 
 import java.sql.Timestamp;
 import java.util.List;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +30,17 @@ public class StatsServiceImpl implements StatsService {
         log.info("Retrieving stats for the period from: {} to: {} for uris: {} with unique flag: {}", start, end, uris, unique);
         List<ViewStats> stats;
         if (Boolean.TRUE.equals(unique)) {
-            stats = statsRepository.findStatsByDatesUniqueIp(start, end, uris);
+            if (uris == null) {
+                stats = statsRepository.findStatsByDatesUniqueIp(start, end);
+            } else {
+                stats = statsRepository.findStatsByDatesUniqueIp(start, end, uris);
+            }
         } else {
-            stats = statsRepository.findStatsByDates(start, end, uris);
+            if (uris == null) {
+                stats = statsRepository.findStatsByDates(start, end);
+            } else {
+                stats = statsRepository.findStatsByDates(start, end, uris);
+            }
         }
         log.info("Stats retrieved successfully for the period from: {} to: {} for uris: {} with unique flag: {}", start, end, uris, unique);
         return stats;
