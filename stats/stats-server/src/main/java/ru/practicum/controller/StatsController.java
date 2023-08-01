@@ -40,7 +40,7 @@ public class StatsController {
     public List<ViewStatsResponseDto> getStats(
             @RequestParam Timestamp start,
             @RequestParam Timestamp end,
-            @RequestParam List<String> uris,
+            @RequestParam(required = false) List<String> uris,
             @RequestParam(defaultValue = "false") boolean unique) {
         log.info("Received request to get stats from: {} to: {} for uris: {} with unique flag: {}", start, end, uris, unique);
         return statsMapper.toListViewStatsResponseDto(statsService.getStats(start, end, uris, unique));
