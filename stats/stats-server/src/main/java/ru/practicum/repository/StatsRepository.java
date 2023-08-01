@@ -26,7 +26,7 @@ public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
 
     @Query(value = "SELECT new ru.practicum.entity.ViewStats(e.app, e.uri, COUNT(e.ip)) " +
             "FROM EndpointHit AS e " +
-            "WHERE e.timestamp BETWEEN :start AND :end" +
+            "WHERE e.timestamp BETWEEN :start AND :end " +
             "GROUP BY e.app, e.uri " +
             "ORDER BY COUNT(e.ip) DESC")
     List<ViewStats> findStatsByDatesWithoutUris(Timestamp start, Timestamp end);
