@@ -1,8 +1,11 @@
 package ru.practicum.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -13,5 +16,5 @@ public class EndpointHitResponseDto {
     private String app;
     private String uri;
     private String ip;
-    private Timestamp timestamp;
+    private LocalDateTime timestamp;
 }

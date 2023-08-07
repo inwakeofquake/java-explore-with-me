@@ -8,8 +8,8 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.dto.EndpointHitRequestDto;
 
 import javax.servlet.http.HttpServletRequest;
-import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Slf4j
 public class StatsClient extends BaseClient {
@@ -30,7 +30,7 @@ public class StatsClient extends BaseClient {
                 .app(APPLICATION_NAME)
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
-                .timestamp(Timestamp.from(Instant.now()))
+                .timestamp(LocalDateTime.from(Instant.now()))
                 .build();
         log.info("Creating hit with details: {}", hit);
         post("/hit", hit);
