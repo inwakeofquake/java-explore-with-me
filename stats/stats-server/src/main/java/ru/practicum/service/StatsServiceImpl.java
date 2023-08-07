@@ -14,12 +14,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class StatsServiceImpl implements StatsService {
 
     private final StatsRepository statsRepository;
 
     @Override
+    @Transactional
     public EndpointHit createHit(EndpointHit endpointHit) {
         log.info("Creating hit for endpoint: {}", endpointHit);
         EndpointHit result = statsRepository.save(endpointHit);
