@@ -7,8 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Data
 @Builder
@@ -23,7 +22,5 @@ public class EndpointHitRequestDto {
     @NotBlank(message = "ip cannot be blank")
     private String ip;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @NotNull(message = "timestamp cannot be null")
-    private LocalDateTime timestamp;
-
+    private Timestamp timestamp;
 }
