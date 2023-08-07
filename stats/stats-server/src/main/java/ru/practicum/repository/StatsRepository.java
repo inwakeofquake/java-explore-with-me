@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import ru.practicum.entity.EndpointHit;
 import ru.practicum.entity.ViewStats;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
@@ -15,26 +15,26 @@ public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
             "WHERE e.timestamp BETWEEN :start AND :end AND e.uri IN (:uris) " +
             "GROUP BY e.app, e.uri " +
             "ORDER BY COUNT(e.ip) DESC")
-    List<ViewStats> findStatsByDates(LocalDateTime start, LocalDateTime end, List<String> uris);
+    List<ViewStats> findStatsByDates(Timestamp start, Timestamp end, List<String> uris);
 
     @Query(value = "SELECT new ru.practicum.entity.ViewStats(e.app, e.uri, COUNT(DISTINCT e.ip)) " +
             "FROM EndpointHit AS e " +
             "WHERE e.timestamp BETWEEN :start AND :end AND e.uri IN (:uris) " +
             "GROUP BY e.app, e.uri " +
             "ORDER BY COUNT(e.ip) DESC")
-    List<ViewStats> findStatsByDatesUniqueIp(LocalDateTime start, LocalDateTime end, List<String> uris);
+    List<ViewStats> findStatsByDatesUniqueIp(Timestamp start, Timestamp end, List<String> uris);
 
     @Query(value = "SELECT new ru.practicum.entity.ViewStats(e.app, e.uri, COUNT(e.ip)) " +
             "FROM EndpointHit AS e " +
             "WHERE e.timestamp BETWEEN :start AND :end " +
             "GROUP BY e.app, e.uri " +
             "ORDER BY COUNT(e.ip) DESC")
-    List<ViewStats> findStatsByDatesWithoutUris(LocalDateTime start, LocalDateTime end);
+    List<ViewStats> findStatsByDatesWithoutUris(Timestamp start, Timestamp end);
 
     @Query(value = "SELECT new ru.practicum.entity.ViewStats(e.app, e.uri, COUNT(DISTINCT e.ip)) " +
             "FROM EndpointHit AS e " +
             "WHERE e.timestamp BETWEEN :start AND :end " +
             "GROUP BY e.app, e.uri " +
             "ORDER BY COUNT(e.ip) DESC")
-    List<ViewStats> findStatsByDatesUniqueIpWithoutUris(LocalDateTime start, LocalDateTime end);
+    List<ViewStats> findStatsByDatesUniqueIpWithoutUris(Timestamp start, Timestamp end);
 }

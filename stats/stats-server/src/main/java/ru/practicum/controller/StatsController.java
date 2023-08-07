@@ -12,7 +12,7 @@ import ru.practicum.mapper.StatsMapper;
 import ru.practicum.service.StatsService;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 
 @RestController
@@ -34,8 +34,8 @@ public class StatsController {
 
     @GetMapping("/stats")
     public List<ViewStatsResponseDto> getStats(
-            @RequestParam LocalDateTime start,
-            @RequestParam LocalDateTime end,
+            @RequestParam Timestamp start,
+            @RequestParam Timestamp end,
             @RequestParam(required = false) List<String> uris,
             @RequestParam(defaultValue = "false") boolean unique) {
         log.info("Received request to get stats from: {} to: {} for uris: {} with unique flag: {}",
