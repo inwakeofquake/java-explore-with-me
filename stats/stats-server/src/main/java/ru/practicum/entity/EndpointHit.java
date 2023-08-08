@@ -1,18 +1,16 @@
 package ru.practicum.entity;
 
-import lombok.*;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+import static ru.practicum.utility.Constants.DATE;
+
 @Entity
-@Table(name = "stats")
-@EqualsAndHashCode
+@Table(name = "hits")
+@Data
 public class EndpointHit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,5 +18,6 @@ public class EndpointHit {
     private String app;
     private String uri;
     private String ip;
-    private Timestamp timestamp;
+    @DateTimeFormat(pattern = DATE)
+    private LocalDateTime timestamp;
 }

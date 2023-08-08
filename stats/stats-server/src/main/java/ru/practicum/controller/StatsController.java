@@ -1,45 +1,36 @@
 package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.dto.EndpointHitRequestDto;
-import ru.practicum.dto.EndpointHitResponseDto;
-import ru.practicum.dto.ViewStatsResponseDto;
-import ru.practicum.mapper.StatsMapper;
-import ru.practicum.service.StatsService;
+import ru.practicum.dto.EndpointHitDto;
+import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.service.StatService;
 
-import javax.validation.Valid;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
-@RestController
-@Validated
-@RequiredArgsConstructor
-@Slf4j
-public class StatsController {
+import static ru.practicum.utility.Constants.DATE;
 
-    private final StatsService statsService;
-    private final StatsMapper statsMapper;
+@RestController
+@RequiredArgsConstructor
+public class StatsController {
+    private final StatService statService;
 
     @PostMapping("/hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public EndpointHitResponseDto create(@RequestBody @Valid EndpointHitRequestDto endpointHitRequestDto) {
-        log.info("Received request to create endpoint hit: {}", endpointHitRequestDto);
-        return statsMapper.toEndpointHitResponseDto(statsService.createHit(statsMapper
-                .toEndpointHit(endpointHitRequestDto)));
+    public void createHit(@RequestBody EndpointHitDto endpointHitDto) {
+        statService.saveHit(endpointHitDto);
     }
 
     @GetMapping("/stats")
-    public List<ViewStatsResponseDto> getStats(
-            @RequestParam Timestamp start,
-            @RequestParam Timestamp end,
-            @RequestParam(required = false) List<String> uris,
-            @RequestParam(defaultValue = "false") boolean unique) {
-        log.info("Received request to get stats from: {} to: {} for uris: {} with unique flag: {}",
-                start, end, uris, unique);
-        return statsMapper.toListViewStatsResponseDto(statsService.getStats(start, end, uris, unique));
+    public List<ViewStatsDto> getStats(@DateTimeFormat(pattern = DATE)
+                                       @RequestParam(value = "start") LocalDateTime start,
+                                       @DateTimeFormat(pattern = DATE)
+                                       @RequestParam(value = "end") LocalDateTime end,
+                                       @RequestParam(required = false) List<String> uris,
+                                       @RequestParam(required = false, defaultValue = "false") Boolean unique) {
+        return statService.getStats(start, end, uris, unique);
     }
 }
