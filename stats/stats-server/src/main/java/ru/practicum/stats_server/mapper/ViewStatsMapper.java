@@ -1,8 +1,8 @@
-package ru.practicum.mapper;
+package ru.practicum.stats_server.mapper;
 
 import org.mapstruct.Mapper;
 import ru.practicum.dto.ViewStatsDto;
-import ru.practicum.entity.ViewStats;
+import ru.practicum.stats_server.entity.ViewStats;
 
 import java.util.List;
 

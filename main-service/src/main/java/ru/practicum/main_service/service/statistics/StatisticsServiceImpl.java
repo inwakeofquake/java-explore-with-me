@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.main_service.entity.Event;
-import ru.practicum.StatClient;
+import ru.practicum.stats_client.StatClient;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;

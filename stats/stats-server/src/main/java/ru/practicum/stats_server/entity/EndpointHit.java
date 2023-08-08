@@ -1,4 +1,4 @@
-package ru.practicum.entity;
+package ru.practicum.stats_server.entity;
 
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -6,7 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-import static ru.practicum.utility.Constants.DATE;
+import static ru.practicum.stats_server.utility.Constants.DATE;
 
 @Entity
 @Table(name = "hits")

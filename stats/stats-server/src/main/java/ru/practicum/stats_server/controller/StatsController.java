@@ -1,4 +1,4 @@
-package ru.practicum.controller;
+package ru.practicum.stats_server.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -6,12 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
-import ru.practicum.service.StatService;
+import ru.practicum.stats_server.service.StatService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.utility.Constants.DATE;
+import static ru.practicum.stats_server.utility.Constants.DATE;
 
 @RestController
 @RequiredArgsConstructor
