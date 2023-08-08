@@ -42,6 +42,6 @@ services:
     ports:
       - "6541:5432"
     environment:
-      POSTGRES_DB: ewm-service
+      POSTGRES_DB: ewm
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

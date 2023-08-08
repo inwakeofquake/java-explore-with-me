@@ -13,7 +13,7 @@ import ru.practicum.main_service.entity.ApiError;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static ru.practicum.main_service.util.Constants.DATE;
+import static ru.practicum.main_service.utility.Constants.DATE;
 
 @RestControllerAdvice
 public class ErrorHandler {

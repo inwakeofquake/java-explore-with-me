@@ -31,7 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.practicum.main_service.util.Constants.DATE;
+import static ru.practicum.main_service.utility.Constants.DATE;
 
 @Service
 @RequiredArgsConstructor

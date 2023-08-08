@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static ru.practicum.main_service.util.Constants.DATE;
+import static ru.practicum.main_service.utility.Constants.DATE;
 
 @Getter
 @Setter

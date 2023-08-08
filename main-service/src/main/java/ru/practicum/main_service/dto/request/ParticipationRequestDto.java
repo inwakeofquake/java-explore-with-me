@@ -9,7 +9,7 @@ import ru.practicum.main_service.enums.RequestStatus;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-import static ru.practicum.main_service.util.Constants.DATE;
+import static ru.practicum.main_service.utility.Constants.DATE;
 
 @Getter
 @Setter

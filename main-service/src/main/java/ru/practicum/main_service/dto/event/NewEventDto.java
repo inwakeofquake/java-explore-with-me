@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
-import static ru.practicum.main_service.util.Constants.DATE;
+import static ru.practicum.main_service.utility.Constants.DATE;
 
 @AllArgsConstructor
 @NoArgsConstructor
