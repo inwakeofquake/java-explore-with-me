@@ -7,6 +7,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @ToString
 @EqualsAndHashCode
 public class EndpointHitDto {
