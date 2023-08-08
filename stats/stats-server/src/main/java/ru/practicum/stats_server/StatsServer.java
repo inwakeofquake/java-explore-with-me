@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-public class StatsServerApp {
+public class StatsServer {
     public static void main(String[] args) {
-        SpringApplication.run(StatsServerApp.class, args);
+        SpringApplication.run(StatsServer.class, args);
     }
 
     @Bean

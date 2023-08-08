@@ -14,6 +14,7 @@ import ru.practicum.main_service.enums.SortValue;
 import ru.practicum.main_service.enums.StateActionForAdmin;
 import ru.practicum.main_service.enums.StateActionForUser;
 import ru.practicum.main_service.exceptions.*;
+
 import ru.practicum.main_service.mapper.EventMapper;
 import ru.practicum.main_service.repository.CategoryRepository;
 import ru.practicum.main_service.repository.EventRepository;
@@ -207,12 +208,12 @@ public class EventServiceImpl implements EventService {
         Root<Event> root = query.from(Event.class);
         Predicate criteria = builder.conjunction();
 
-        if (categoriesId != null && categoriesId.size() > 0) {
+        if (categoriesId != null && !categoriesId.isEmpty()) {
             Predicate containCategories = root.get("category").in(categoriesId);
             criteria = builder.and(criteria, containCategories);
         }
 
-        if (users != null && users.size() > 0) {
+        if (users != null && !users.isEmpty()) {
             Predicate containUsers = root.get("initiator").in(users);
             criteria = builder.and(criteria, containUsers);
         }
@@ -237,7 +238,7 @@ public class EventServiceImpl implements EventService {
                 .setMaxResults(size)
                 .getResultList();
 
-        if (events.size() == 0) {
+        if (events.isEmpty()) {
             return new ArrayList<>();
         }
 
@@ -247,7 +248,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventFullDto> getEventsWithParamsByUser(String text, List<Long> categories, Boolean paid, String rangeStart,
-                                                        String rangeEnd, Boolean onlyAvailable, SortValue sort,
+                                                        String rangeEnd, boolean onlyAvailable, SortValue sort,
                                                         Integer from, Integer size, HttpServletRequest request) {
         LocalDateTime start = rangeStart != null ? LocalDateTime.parse(rangeStart, dateFormatter) : null;
         LocalDateTime end = rangeEnd != null ? LocalDateTime.parse(rangeEnd, dateFormatter) : null;
@@ -312,7 +313,7 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        if (events.size() == 0) {
+        if (events.isEmpty()) {
             return new ArrayList<>();
         }
 
