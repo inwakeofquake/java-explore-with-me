@@ -122,7 +122,7 @@ public class EventServiceImpl implements EventService {
         if (updateEventAdminDto.getEventDate() != null) {
             LocalDateTime eventDateTime = updateEventAdminDto.getEventDate();
             if (eventDateTime.isBefore(LocalDateTime.now())
-                    || eventDateTime.isBefore(event.getPublishedOn().plusHours(1))) {
+                    || (event.getPublishedOn() != null && eventDateTime.isBefore(event.getPublishedOn().plusHours(1)))) {
                 throw new WrongRequestArgumentException("The start date of the event to be modified is less than one hour from the publication date.");
             }
 

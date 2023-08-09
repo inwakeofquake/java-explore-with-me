@@ -56,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new CategoryNotExistException("Category doesn't exist"));
-        if (categoryRepository.existsByName(categoryDto.getName())) {
+        if (!category.getName().equals(categoryDto.getName()) && categoryRepository.existsByName(categoryDto.getName())) {
             throw new NameAlreadyExistException(String.format("Can't update category because name: %s already used by another category", categoryDto.getName()));
         }
         category.setName(categoryDto.getName());
