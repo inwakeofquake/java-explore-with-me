@@ -38,10 +38,13 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
-        List<Event> events = eventRepository.findAllByIdIn(newCompilationDto.getEvents());
+        List<Event> events = new ArrayList<>();
+        if (newCompilationDto.getEvents() != null) {
+            events = eventRepository.findAllByIdIn(newCompilationDto.getEvents());
+        }
         Compilation compilation = new Compilation();
         compilation.setEvents(new HashSet<>(events));
-        compilation.setPinned(newCompilationDto.getPinned());
+        compilation.setPinned(newCompilationDto.getPinned() != null && newCompilationDto.getPinned());
         compilation.setTitle(newCompilationDto.getTitle());
 
         Compilation savedCompilation = compilationRepository.save(compilation);

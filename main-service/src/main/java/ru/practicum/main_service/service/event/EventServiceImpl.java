@@ -201,7 +201,9 @@ public class EventServiceImpl implements EventService {
         LocalDateTime start = rangeStart != null ? LocalDateTime.parse(rangeStart, dateFormatter) : null;
         LocalDateTime end = rangeEnd != null ? LocalDateTime.parse(rangeEnd, dateFormatter) : null;
 
+        System.out.println("CAMAPA " + start + " " + end);
         if (start != null && end != null && end.isBefore(start)) {
+            System.out.println("CAMAPA " + end.isBefore(start));
             throw new WrongRequestArgumentException("Range end cannot be before range start");
         }
 
