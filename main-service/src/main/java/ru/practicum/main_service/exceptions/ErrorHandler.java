@@ -100,11 +100,11 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ApiError handleWrongTimeOfEventException(final WrongTimeException exception) {
         return new ApiError(exception.getMessage(), "For the requested operation the conditions are not met.",
-                HttpStatus.FORBIDDEN.getReasonPhrase().toUpperCase(), LocalDateTime.now().format(dateFormatter));
+                HttpStatus.BAD_REQUEST.getReasonPhrase().toUpperCase(), LocalDateTime.now().format(dateFormatter));
     }
 
     @ExceptionHandler
@@ -137,7 +137,6 @@ public class ErrorHandler {
         return new ApiError("Can't delete user with this id", "User with this id doesn't exist",
                 HttpStatus.NOT_FOUND.getReasonPhrase().toUpperCase(), LocalDateTime.now().format(dateFormatter));
     }
-
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)

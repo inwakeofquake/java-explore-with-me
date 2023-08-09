@@ -123,7 +123,7 @@ public class EventServiceImpl implements EventService {
             LocalDateTime eventDateTime = updateEventAdminDto.getEventDate();
             if (eventDateTime.isBefore(LocalDateTime.now())
                     || eventDateTime.isBefore(event.getPublishedOn().plusHours(1))) {
-                throw new WrongTimeException("The start date of the event to be modified is less than one hour from the publication date.");
+                throw new WrongRequestArgumentException("The start date of the event to be modified is less than one hour from the publication date.");
             }
 
             event.setEventDate(updateEventAdminDto.getEventDate());
@@ -201,7 +201,7 @@ public class EventServiceImpl implements EventService {
         LocalDateTime start = rangeStart != null ? LocalDateTime.parse(rangeStart, dateFormatter) : null;
         LocalDateTime end = rangeEnd != null ? LocalDateTime.parse(rangeEnd, dateFormatter) : null;
 
-        if ((start != null) && (end != null) && (end.isBefore(start))) {
+        if (start != null && end != null && end.isBefore(start)) {
             throw new WrongRequestArgumentException("Range end cannot be before range start");
         }
 
@@ -329,11 +329,11 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getEvent(Long id, HttpServletRequest request) {
         Event event = eventRepository.findByIdAndPublishedOnIsNotNull(id)
                 .orElseThrow(() -> new EventNotExistException(String.format("Can't find event with id = %s event doesn't exist", id)));
-        statisticsService.setView(event);
+        List<Event> events = new ArrayList<>();
+        events.add(event);
+        setView(events);
         statisticsService.sendStat(event, request);
-        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
-        event.setViews(event.getViews() + 1);
-        return eventFullDto;
+        return eventMapper.toEventFullDto(event);
     }
 
     @Override
