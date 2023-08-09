@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
-import ru.practicum.stats_server.repository.StatRepository;
 import ru.practicum.stats_server.mapper.EndpointHitMapper;
 import ru.practicum.stats_server.mapper.ViewStatsMapper;
+import ru.practicum.stats_server.repository.StatRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,11 +26,11 @@ public class StatServiceImpl implements StatService {
     public void saveHit(EndpointHitDto endpointHitDto) {
         log.debug("Attempting to save hit by app: {}", endpointHitDto.getApp());
         statServerRepository.save(endpointHitMapper.toEntity(endpointHitDto));
-        log.info("Successfully saved hit for app: {}", endpointHitDto.getApp());
+        log.info("Successfully saved hit for app: {} {} {} {}", endpointHitDto.getApp(), endpointHitDto.getIp(), endpointHitDto.getTimestamp(), endpointHitDto.getUri());
     }
 
     @Override
-    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+    public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         log.debug("Fetching stats between {} and {}. Unique? {}. Uris: {}", start, end, unique, uris);
 
         List<ViewStatsDto> result;
@@ -57,7 +57,7 @@ public class StatServiceImpl implements StatService {
             }
         }
 
-        log.info("Retrieved {} records for the provided criteria", result.size());
+        log.info("Retrieved {} {} {} {} {} records for the provided criteria", result.size(), start, end, uris, unique);
         return result;
     }
 }
