@@ -14,7 +14,6 @@ import ru.practicum.main_service.enums.SortValue;
 import ru.practicum.main_service.enums.StateActionForAdmin;
 import ru.practicum.main_service.enums.StateActionForUser;
 import ru.practicum.main_service.exceptions.*;
-
 import ru.practicum.main_service.mapper.EventMapper;
 import ru.practicum.main_service.repository.CategoryRepository;
 import ru.practicum.main_service.repository.EventRepository;
@@ -202,6 +201,10 @@ public class EventServiceImpl implements EventService {
         LocalDateTime start = rangeStart != null ? LocalDateTime.parse(rangeStart, dateFormatter) : null;
         LocalDateTime end = rangeEnd != null ? LocalDateTime.parse(rangeEnd, dateFormatter) : null;
 
+        if ((start != null) && (end != null) && (end.isBefore(start))) {
+            throw new WrongRequestArgumentException("Range end cannot be before range start");
+        }
+
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> query = builder.createQuery(Event.class);
 
@@ -328,7 +331,9 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new EventNotExistException(String.format("Can't find event with id = %s event doesn't exist", id)));
         statisticsService.setView(event);
         statisticsService.sendStat(event, request);
-        return eventMapper.toEventFullDto(event);
+        EventFullDto eventFullDto = eventMapper.toEventFullDto(event);
+        event.setViews(event.getViews() + 1);
+        return eventFullDto;
     }
 
     @Override

@@ -123,6 +123,14 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleWrongRequestArgument(final WrongRequestArgumentException exception) {
+        return new ApiError(exception.getMessage(), "Wrong request argument.",
+                HttpStatus.BAD_REQUEST.getReasonPhrase().toUpperCase(), LocalDateTime.now().format(dateFormatter));
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public ApiError handleUserNotExistException(final UserNotExistException exception) {

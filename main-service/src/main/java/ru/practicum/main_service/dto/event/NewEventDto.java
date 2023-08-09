@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.main_service.entity.Location;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import static ru.practicum.main_service.utility.Constants.DATE;
 @Setter
 public class NewEventDto {
     @NotNull
+    @NotBlank(message = "annotation cannot be blank")
     @Size(min = 3, max = 500)
     private String annotation;
     @NotNull
