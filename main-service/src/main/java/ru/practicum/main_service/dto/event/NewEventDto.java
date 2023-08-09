@@ -21,12 +21,12 @@ import static ru.practicum.main_service.utility.Constants.DATE;
 public class NewEventDto {
     @NotNull
     @NotBlank(message = "annotation cannot be blank")
-    @Size(min = 3, max = 500)
+    @Size(min = 20, max = 2000)
     private String annotation;
     @NotNull
     private Long category;
     @NotNull
-    @Size(min = 20, max = 5000)
+    @Size(min = 20, max = 7000)
     private String description;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE)
