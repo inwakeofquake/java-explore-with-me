@@ -78,8 +78,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public void setView(Event event) {
-        String startTime = event.getCreatedOn().minusMinutes(1).format(dateFormatter);
-        String endTime = LocalDateTime.now().plusMinutes(1).format(dateFormatter);
+        String startTime = event.getCreatedOn().minusDays(1).format(dateFormatter);
+        String endTime = LocalDateTime.now().plusDays(1).format(dateFormatter);
         List<String> uris = List.of("/events/" + event.getId());
 
         List<ViewStatsDto> stats = getStats(startTime, endTime, uris);
