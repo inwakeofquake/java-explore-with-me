@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.main_service.exceptions.WrongRequestArgumentException;
 import ru.practicum.stats_server.mapper.EndpointHitMapper;
 import ru.practicum.stats_server.mapper.ViewStatsMapper;
 import ru.practicum.stats_server.repository.StatRepository;
@@ -34,6 +35,10 @@ public class StatServiceImpl implements StatService {
         log.debug("Fetching stats between {} and {}. Unique? {}. Uris: {}", start, end, unique, uris);
 
         List<ViewStatsDto> result;
+
+        if (end.isBefore(start)) {
+            throw new WrongRequestArgumentException("Wrong time arguments");
+        }
 
         if (unique) {
             if (uris == null || uris.isEmpty()) {
