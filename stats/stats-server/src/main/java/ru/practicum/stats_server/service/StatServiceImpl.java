@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
-
 import ru.practicum.stats_server.exceptions.WrongRequestArgumentException;
 import ru.practicum.stats_server.mapper.EndpointHitMapper;
 import ru.practicum.stats_server.mapper.ViewStatsMapper;
@@ -27,8 +26,9 @@ public class StatServiceImpl implements StatService {
     @Override
     public void saveHit(EndpointHitDto endpointHitDto) {
         log.debug("Attempting to save hit by app: {}", endpointHitDto.getApp());
-        statServerRepository.save(endpointHitMapper.toEntity(endpointHitDto));
+        log.info(statServerRepository.save(endpointHitMapper.toEntity(endpointHitDto)).toString());
         log.info("Successfully saved hit for app: {}", endpointHitDto.getApp());
+        System.out.println("CAMAPA HIT " + endpointHitDto.getApp() + " " + endpointHitDto.getIp() + " " + endpointHitDto.getTimestamp() + " " + endpointHitDto.getUri());
     }
 
     @Override
@@ -40,7 +40,7 @@ public class StatServiceImpl implements StatService {
         if (end.isBefore(start)) {
             throw new WrongRequestArgumentException("Wrong time arguments");
         }
-
+        System.out.println("CAMAPA GET " + start + " " + end + " " + uris);
         if (unique) {
             if (uris == null || uris.isEmpty()) {
                 result = statServerRepository.findDistinctViewsAll(start, end)
@@ -57,6 +57,9 @@ public class StatServiceImpl implements StatService {
                         .stream()
                         .map(viewStatsMapper::toViewStatsDto).collect(Collectors.toList());
             } else {
+                for (String t : uris) {
+                    System.out.println("EVERY URI " + t);
+                }
                 result = statServerRepository.findViews(start, end, uris)
                         .stream()
                         .map(viewStatsMapper::toViewStatsDto).collect(Collectors.toList());
