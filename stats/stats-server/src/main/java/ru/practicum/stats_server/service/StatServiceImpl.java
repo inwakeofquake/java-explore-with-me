@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
-import ru.practicum.main_service.exceptions.WrongRequestArgumentException;
+
+import ru.practicum.stats_server.exceptions.WrongRequestArgumentException;
 import ru.practicum.stats_server.mapper.EndpointHitMapper;
 import ru.practicum.stats_server.mapper.ViewStatsMapper;
 import ru.practicum.stats_server.repository.StatRepository;
