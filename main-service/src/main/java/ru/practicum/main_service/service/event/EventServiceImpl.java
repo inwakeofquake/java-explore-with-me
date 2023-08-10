@@ -332,11 +332,10 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventFullDto getEvent(Long id, HttpServletRequest request) {
         Event event = eventRepository.findByIdAndPublishedOnIsNotNull(id)
-                .orElseThrow(() -> new EventNotExistException(String.format("Can't find event with id = %s event doesn't exist", id)));
+                .orElseThrow(() -> new EventNotExistException(String.format(
+                        "Can't find event with id = %s event doesn't exist", id)));
         statisticsService.setView(event);
         statisticsService.sendStat(event, request);
-        if (id == 6)
-            event.setViews(1L);
         return eventMapper.toEventFullDto(event);
     }
 
