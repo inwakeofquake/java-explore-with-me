@@ -56,7 +56,6 @@ public class StatServiceImpl implements StatService {
                         .map(viewStatsMapper::toViewStatsDto).collect(Collectors.toList());
             }
         }
-
         log.info("Retrieved {} records for the provided criteria", result.size());
         return result;
     }
