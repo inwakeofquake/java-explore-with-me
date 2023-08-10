@@ -33,27 +33,25 @@ public class StatServiceImpl implements StatService {
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         log.debug("Fetching stats between {} and {}. Unique? {}. Uris: {}", start, end, unique, uris);
 
-        LocalDateTime s = LocalDateTime.of(1900,1,1,1,1);
-        LocalDateTime e = LocalDateTime.of(2500,1,1,1,1);
         List<ViewStatsDto> result;
 
         if (unique) {
             if (uris == null || uris.isEmpty()) {
-                result = statServerRepository.findDistinctViewsAll(s, e)
+                result = statServerRepository.findDistinctViewsAll(start, end)
                         .stream()
                         .map(viewStatsMapper::toViewStatsDto).collect(Collectors.toList());
             } else {
-                result = statServerRepository.findDistinctViews(s, e, uris)
+                result = statServerRepository.findDistinctViews(start, end, uris)
                         .stream()
                         .map(viewStatsMapper::toViewStatsDto).collect(Collectors.toList());
             }
         } else {
             if (uris == null || uris.isEmpty()) {
-                result = statServerRepository.findViewsAll(s, e)
+                result = statServerRepository.findViewsAll(start, end)
                         .stream()
                         .map(viewStatsMapper::toViewStatsDto).collect(Collectors.toList());
             } else {
-                result = statServerRepository.findViews(s, e, uris)
+                result = statServerRepository.findViews(start, end, uris)
                         .stream()
                         .map(viewStatsMapper::toViewStatsDto).collect(Collectors.toList());
             }
