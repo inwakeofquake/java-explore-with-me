@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
-import ru.practicum.stats_server.entity.ViewStats;
 import ru.practicum.stats_server.mapper.EndpointHitMapper;
 import ru.practicum.stats_server.mapper.ViewStatsMapper;
 import ru.practicum.stats_server.repository.StatRepository;
@@ -64,6 +63,5 @@ public class StatServiceImpl implements StatService {
                 LocalDateTime.of(2500, 1, 1, 1, 1)));
         return result;
     }
-
 
 }
