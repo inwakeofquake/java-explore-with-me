@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.stats_server.entity.ViewStats;
 import ru.practicum.stats_server.mapper.EndpointHitMapper;
 import ru.practicum.stats_server.mapper.ViewStatsMapper;
 import ru.practicum.stats_server.repository.StatRepository;
@@ -58,9 +59,11 @@ public class StatServiceImpl implements StatService {
         }
 
         log.info("Retrieved {} records for the provided criteria", result.size());
-        log.info("CAMAPA Retrieving ALL DATA FROM DATABASE {}", statServerRepository.findViewsAll(
+        log.info("Retrieving ALL DATA FROM DATABASE {}", statServerRepository.findViewsAll(
                 LocalDateTime.of(1900, 1, 1, 1, 1),
                 LocalDateTime.of(2500, 1, 1, 1, 1)));
         return result;
     }
+
+
 }
