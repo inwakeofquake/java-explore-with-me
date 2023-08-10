@@ -12,12 +12,12 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode
 public class EndpointHitDto {
     private Long id;
-    @NotBlank(message = "app cannot be blank")
+    @NotBlank
     private String app;
-    @NotBlank(message = "uri cannot be blank")
+    @NotBlank
     private String uri;
-    @NotBlank(message = "ip cannot be blank")
+    @NotBlank
     private String ip;
-    @NotBlank(message = "timestamp cannot be blank")
+    @NotBlank
     private String timestamp;
 }

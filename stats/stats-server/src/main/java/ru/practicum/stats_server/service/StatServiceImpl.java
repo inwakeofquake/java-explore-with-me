@@ -26,7 +26,7 @@ public class StatServiceImpl implements StatService {
     public void saveHit(EndpointHitDto endpointHitDto) {
         log.debug("Attempting to save hit by app: {}", endpointHitDto.getApp());
         statServerRepository.save(endpointHitMapper.toEntity(endpointHitDto));
-        log.info("Successfully saved hit for app: {} {} {} {}", endpointHitDto.getApp(), endpointHitDto.getIp(), endpointHitDto.getTimestamp(), endpointHitDto.getUri());
+        log.info("Successfully saved hit for app: {}", endpointHitDto.getApp());
     }
 
     @Override
@@ -57,7 +57,10 @@ public class StatServiceImpl implements StatService {
             }
         }
 
-        log.info("Retrieved {} {} {} {} {} records for the provided criteria", result.size(), start, end, uris, unique);
+        log.info("Retrieved {} records for the provided criteria", result.size());
+        log.info("CAMAPA Retrieving ALL DATA FROM DATABASE {}", statServerRepository.findViewsAll(
+                LocalDateTime.of(1900, 1, 1, 1, 1),
+                LocalDateTime.of(2500, 1, 1, 1, 1)));
         return result;
     }
 }
