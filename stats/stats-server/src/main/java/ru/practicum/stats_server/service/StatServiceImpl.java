@@ -58,9 +58,7 @@ public class StatServiceImpl implements StatService {
         }
 
         log.info("Retrieved {} records for the provided criteria", result.size());
-        log.info("Retrieving ALL DATA FROM DATABASE {}", statServerRepository.findViewsAll(
-                LocalDateTime.of(1900, 1, 1, 1, 1),
-                LocalDateTime.of(2500, 1, 1, 1, 1)));
+        log.info("Retrieving ALL DATA FROM DATABASE {}", statServerRepository.tempGetAll());
         return result;
     }
 
