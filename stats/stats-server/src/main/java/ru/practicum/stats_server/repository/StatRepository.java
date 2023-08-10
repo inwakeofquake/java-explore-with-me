@@ -54,6 +54,9 @@ public interface StatRepository extends JpaRepository<EndpointHit, Long> {
             @Param("end") LocalDateTime end);
 
     @Query("SELECT new ru.practicum.stats_server.entity.VSTemp(h.app, h.uri, h.ip, h.timestamp) " +
-            "FROM EndpointHit h")
-    List<VSTemp> tempGetAll();
+            "FROM EndpointHit h " +
+            "WHERE h.timestamp BETWEEN :start and :end")
+    List<VSTemp> tempGetAll(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
 }
