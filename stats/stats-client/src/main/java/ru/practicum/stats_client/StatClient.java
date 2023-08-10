@@ -36,9 +36,16 @@ public class StatClient {
 
         Map<String, Object> parameters = new HashMap<>();
 
+        StringBuilder urisToSend = new StringBuilder();
+        String delimiter = "";
+        for (String uri : uris) {
+            urisToSend.append(delimiter).append(uri);
+            delimiter = ",";
+        }
+
         parameters.put("start", start);
         parameters.put("end", end);
-        parameters.put("uris", uris);
+        parameters.put("uris", urisToSend);
         parameters.put("unique", unique);
 
         ResponseEntity<String> response = restTemplate.getForEntity(
