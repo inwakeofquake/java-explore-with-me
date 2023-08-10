@@ -341,7 +341,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void setView(List<Event> events) {
-        LocalDateTime start = events.get(0).getCreatedOn();
+        LocalDateTime start = LocalDateTime.of(1970,1,1,1,1);
         List<String> uris = new ArrayList<>();
         Map<String, Event> eventsUri = new HashMap<>();
         String uri = "";
