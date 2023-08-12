@@ -7,7 +7,6 @@ import lombok.Setter;
 import ru.practicum.main_service.enums.EventState;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -22,7 +21,6 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
     private String annotation;
     @OneToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
@@ -46,7 +44,6 @@ public class Event {
     private Boolean requestModeration;
     @Enumerated(EnumType.STRING)
     private EventState state;
-    @NotBlank
     private String title;
     private Long views;
     @Transient
