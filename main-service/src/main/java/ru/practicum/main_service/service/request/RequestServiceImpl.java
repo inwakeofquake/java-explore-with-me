@@ -84,8 +84,8 @@ public class RequestServiceImpl implements RequestService {
             throw new ParticipantLimitException("exceeding the limit of participants");
         }
 
-        for (Request x : requestsToUpdate) {
-            x.setStatus(RequestStatus.valueOf(requestStatusUpdateDto.getStatus().toString()));
+        for (Request request : requestsToUpdate) {
+            request.setStatus(RequestStatus.valueOf(requestStatusUpdateDto.getStatus().toString()));
         }
 
         requestRepository.saveAll(requestsToUpdate);
