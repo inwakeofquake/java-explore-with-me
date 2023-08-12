@@ -1,6 +1,7 @@
 package ru.practicum.main_service.controller.admin;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.main_service.dto.event.EventFullDto;
@@ -19,6 +20,7 @@ public class AdminEventController {
     private final EventService eventService;
 
     @PatchMapping("/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEvent(@PathVariable(name = "eventId") Long eventId,
                                     @Valid @RequestBody UpdateEventAdminDto updateEventAdminDto) {
         return eventService.updateEvent(eventId, updateEventAdminDto);
@@ -26,6 +28,7 @@ public class AdminEventController {
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<EventFullDto> getEvents(@RequestParam(name = "users", required = false) List<Long> users,
                                         @RequestParam(name = "states", required = false) EventState states,
                                         @RequestParam(name = "categories", required = false) List<Long> categoriesId,

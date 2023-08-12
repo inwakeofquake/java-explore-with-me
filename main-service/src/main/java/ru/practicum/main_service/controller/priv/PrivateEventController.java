@@ -35,6 +35,7 @@ public class PrivateEventController {
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> getEventsByUser(
             @PathVariable Long userId,
             @RequestParam(name = "from", defaultValue = "0", required = false) Integer from,
@@ -43,6 +44,7 @@ public class PrivateEventController {
     }
 
     @GetMapping("/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
     public List<RequestDto> getRequestsByOwnerOfEvent(
             @PathVariable Long userId,
             @PathVariable Long eventId) {
@@ -50,6 +52,7 @@ public class PrivateEventController {
     }
 
     @PatchMapping("/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
     public RequestStatusUpdateResult updateRequests(
             @PathVariable Long userId,
             @PathVariable Long eventId,
@@ -58,6 +61,7 @@ public class PrivateEventController {
     }
 
     @PatchMapping("/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEventByUser(
             @PathVariable Long userId,
             @PathVariable Long eventId,
@@ -66,6 +70,7 @@ public class PrivateEventController {
     }
 
     @GetMapping("/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
     public EventFullDto getEventByUser(
             @PathVariable Long userId,
             @PathVariable Long eventId) {

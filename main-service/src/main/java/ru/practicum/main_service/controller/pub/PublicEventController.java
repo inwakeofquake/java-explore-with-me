@@ -1,6 +1,7 @@
 package ru.practicum.main_service.controller.pub;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.main_service.dto.event.EventFullDto;
 import ru.practicum.main_service.enums.SortValue;
@@ -16,6 +17,7 @@ public class PublicEventController {
     private final EventService eventService;
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<EventFullDto> getEventsWithParamsByUser(
             @RequestParam(name = "text", required = false) String text,
             @RequestParam(name = "categories", required = false) List<Long> categories,
@@ -41,6 +43,7 @@ public class PublicEventController {
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public EventFullDto getEvent(@PathVariable Long id, HttpServletRequest request) {
         return eventService.getEvent(id, request);
     }

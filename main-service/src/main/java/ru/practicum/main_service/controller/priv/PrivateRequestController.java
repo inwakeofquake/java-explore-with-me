@@ -22,11 +22,13 @@ public class PrivateRequestController {
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<RequestDto> getCurrentUserRequests(@PathVariable(name = "userId") Long userId) {
         return requestService.getCurrentUserRequests(userId);
     }
 
     @PatchMapping("/{requestId}/cancel")
+    @ResponseStatus(HttpStatus.OK)
     public RequestDto cancelRequest(@PathVariable(name = "userId") Long userId,
                                     @PathVariable Long requestId) {
         return requestService.cancelRequests(userId, requestId);
