@@ -65,8 +65,10 @@ public class RequestServiceImpl implements RequestService {
 
     @Transactional
     @Override
-    public RequestStatusUpdateResult updateRequests(Long userId, Long eventId, RequestStatusUpdateDto requestStatusUpdateDto) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotExistException("Event doesn't exist"));
+    public RequestStatusUpdateResult updateRequests(
+            Long userId, Long eventId, RequestStatusUpdateDto requestStatusUpdateDto) {
+        Event event = eventRepository.findById(eventId).orElseThrow(
+                () -> new EventNotExistException("Event doesn't exist"));
         RequestStatusUpdateResult result = new RequestStatusUpdateResult();
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
@@ -74,13 +76,18 @@ public class RequestServiceImpl implements RequestService {
         }
 
         List<Request> requests = requestRepository.findAllByEventWithInitiator(userId, eventId);
-        List<Request> requestsToUpdate = requests.stream().filter(x -> requestStatusUpdateDto.getRequestIds().contains(x.getId())).collect(Collectors.toList());
+        List<Request> requestsToUpdate = requests.stream()
+                .filter(request -> requestStatusUpdateDto.getRequestIds().contains(request.getId()))
+                .collect(Collectors.toList());
 
-        if (requestsToUpdate.stream().anyMatch(x -> x.getStatus().equals(RequestStatus.CONFIRMED) && requestStatusUpdateDto.getStatus().equals(RequestStatusToUpdate.REJECTED))) {
+        if (requestsToUpdate.stream().anyMatch(request -> request.getStatus()
+                .equals(RequestStatus.CONFIRMED)
+                && requestStatusUpdateDto.getStatus().equals(RequestStatusToUpdate.REJECTED))) {
             throw new RequestAlreadyConfirmedException("request already confirmed");
         }
 
-        if (event.getConfirmedRequests() + requestsToUpdate.size() > event.getParticipantLimit() && requestStatusUpdateDto.getStatus().equals(RequestStatusToUpdate.CONFIRMED)) {
+        if (event.getConfirmedRequests() + requestsToUpdate.size() > event.getParticipantLimit()
+                && requestStatusUpdateDto.getStatus().equals(RequestStatusToUpdate.CONFIRMED)) {
             throw new ParticipantLimitException("exceeding the limit of participants");
         }
 

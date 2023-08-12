@@ -43,8 +43,8 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
 
     private final EntityManager entityManager;
-    private final String datePattern = DATE;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern);
+    private static final String datePattern = DATE;
+    public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern);
     private final StatisticsService statisticsService;
 
     @Override
@@ -345,7 +345,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void setView(List<Event> events) {
-        LocalDateTime start = LocalDateTime.of(1970,1,1,1,1);
+        LocalDateTime start = LocalDateTime.of(1970, 1, 1, 1, 1);
         List<String> uris = new ArrayList<>();
         Map<String, Event> eventsUri = new HashMap<>();
         String uri = "";

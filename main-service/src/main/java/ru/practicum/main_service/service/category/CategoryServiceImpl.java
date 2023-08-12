@@ -64,6 +64,6 @@ public class CategoryServiceImpl implements CategoryService {
             throw new NameAlreadyExistException(String.format("Can't update category because name: %s already used by another category", categoryDto.getName()));
         }
         category.setName(categoryDto.getName());
-        return categoryMapper.toCategoryDto(categoryRepository.save(category));
+        return categoryMapper.toCategoryDto(category);
     }
 }

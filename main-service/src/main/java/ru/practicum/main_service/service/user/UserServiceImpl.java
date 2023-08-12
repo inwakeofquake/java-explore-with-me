@@ -26,8 +26,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto createUser(UserDto userDto) {
         if (userRepository.existsByName(userDto.getName())) {
-            log.warn(String.format("Can't create user with name: %s, the name was used by another user", userDto.getName()));
-            throw new NameAlreadyExistException(String.format("Can't create user with name: %s, the name was used by another user",
+            log.warn(String.format("Can't create user with name: %s, " +
+                    "the name was used by another user", userDto.getName()));
+            throw new NameAlreadyExistException(String.format("Can't create user with name: %s, " +
+                            "the name was used by another user",
                     userDto.getName()));
         }
         log.debug(String.format("The user with name %s was created", userDto.getName()));
