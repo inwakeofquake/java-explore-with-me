@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.main_service.dto.event.*;
 import ru.practicum.main_service.entity.Category;
@@ -47,6 +48,7 @@ public class EventServiceImpl implements EventService {
     private final StatisticsService statisticsService;
 
     @Override
+    @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         Category category = categoryRepository.findById(newEventDto.getCategory())
                 .orElseThrow(() -> new CategoryNotExistException(""));
@@ -69,6 +71,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto updateEvent(Long eventId, UpdateEventAdminDto updateEventAdminDto) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotExistException(String.format("Can't update event with id = %s", eventId)));
@@ -133,6 +136,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserDto updateEventUserDto) {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new EventNotExistException(""));

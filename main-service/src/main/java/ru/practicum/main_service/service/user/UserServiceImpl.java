@@ -16,7 +16,6 @@ import java.util.List;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserServiceImpl implements UserService {
 
@@ -24,6 +23,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
+    @Transactional
     public UserDto createUser(UserDto userDto) {
         if (userRepository.existsByName(userDto.getName())) {
             log.warn(String.format("Can't create user with name: %s, the name was used by another user", userDto.getName()));
@@ -43,6 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
         log.debug("User with id: {} was deleted ", id);
         userRepository.deleteById(id);
