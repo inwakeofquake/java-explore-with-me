@@ -34,6 +34,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public RequestDto createRequest(Long userId, Long eventId) {
         if (requestRepository.existsByRequesterAndEvent(userId, eventId)) {
             throw new RequestAlreadyExistException("Request already exists");
