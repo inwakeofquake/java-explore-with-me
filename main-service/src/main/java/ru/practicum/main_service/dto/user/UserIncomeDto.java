@@ -13,8 +13,8 @@ import javax.validation.constraints.NotEmpty;
 @RequiredArgsConstructor
 public class UserIncomeDto {
     @NotBlank
-    private final String name;
+    private String name;
     @Email
     @NotEmpty
-    private final String email;
+    private String email;
 }

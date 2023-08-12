@@ -8,6 +8,7 @@ import lombok.Setter;
 import ru.practicum.main_service.entity.Location;
 import ru.practicum.main_service.enums.StateActionForUser;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -18,9 +19,11 @@ import static ru.practicum.main_service.utility.Constants.DATE;
 @Getter
 @Setter
 public class UpdateEventUserDto {
+    @NotBlank
     @Size(min = 20, max = 2000)
     private String annotation;
     private Long category;
+    @NotBlank
     @Size(min = 20, max = 7000)
     private String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE)
@@ -30,6 +33,7 @@ public class UpdateEventUserDto {
     private Long participantLimit;
     private Boolean requestModeration;
     private StateActionForUser stateAction;
+    @NotBlank
     @Size(min = 3, max = 120)
     private String title;
 }

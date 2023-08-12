@@ -19,13 +19,13 @@ import static ru.practicum.main_service.utility.Constants.DATE;
 @Getter
 @Setter
 public class NewEventDto {
-    @NotNull
+
     @NotBlank(message = "annotation cannot be blank")
     @Size(min = 20, max = 2000)
     private String annotation;
     @NotNull
     private Long category;
-    @NotNull
+    @NotBlank
     @Size(min = 20, max = 7000)
     private String description;
     @NotNull
@@ -36,7 +36,7 @@ public class NewEventDto {
     private boolean paid;
     private int participantLimit;
     private Boolean requestModeration;
-    @NotNull
+    @NotBlank
     @Size(min = 3, max = 120)
     private String title;
 }
