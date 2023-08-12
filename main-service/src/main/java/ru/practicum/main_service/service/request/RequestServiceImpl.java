@@ -18,7 +18,6 @@ import ru.practicum.main_service.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +38,8 @@ public class RequestServiceImpl implements RequestService {
         if (requestRepository.existsByRequesterAndEvent(userId, eventId)) {
             throw new RequestAlreadyExistException("Request already exists");
         }
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotExistException("Event doesnt exist"));
+        Event event = eventRepository.findById(eventId).orElseThrow(()
+                -> new EventNotExistException("Event doesnt exist"));
         if (event.getInitiator().getId().equals(userId)) {
             throw new WrongUserException("Can't create request by initiator");
         }
@@ -65,22 +65,30 @@ public class RequestServiceImpl implements RequestService {
 
     @Transactional
     @Override
-    public RequestStatusUpdateResult updateRequests(Long userId, Long eventId, RequestStatusUpdateDto requestStatusUpdateDto) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotExistException("Event doesn't exist"));
+    public RequestStatusUpdateResult updateRequests(
+            Long userId,
+            Long eventId,
+            RequestStatusUpdateDto requestStatusUpdateDto) {
+        Event event = eventRepository.findById(eventId).orElseThrow(()
+                -> new EventNotExistException("Event doesn't exist"));
         RequestStatusUpdateResult result = new RequestStatusUpdateResult();
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             return result;
         }
 
-        List<Request> requests = requestRepository.findAllByEventWithInitiator(userId, eventId);
-        List<Request> requestsToUpdate = requests.stream().filter(x -> requestStatusUpdateDto.getRequestIds().contains(x.getId())).collect(Collectors.toList());
+        List<Request> requestsToUpdate = requestRepository.findAllByEventWithInitiatorAndIds(
+                userId,
+                eventId,
+                requestStatusUpdateDto.getRequestIds());
 
-        if (requestsToUpdate.stream().anyMatch(x -> x.getStatus().equals(RequestStatus.CONFIRMED) && requestStatusUpdateDto.getStatus().equals(RequestStatusToUpdate.REJECTED))) {
+        if (requestsToUpdate.stream().anyMatch(request -> request.getStatus().equals(RequestStatus.CONFIRMED)
+                && requestStatusUpdateDto.getStatus().equals(RequestStatusToUpdate.REJECTED))) {
             throw new RequestAlreadyConfirmedException("request already confirmed");
         }
 
-        if (event.getConfirmedRequests() + requestsToUpdate.size() > event.getParticipantLimit() && requestStatusUpdateDto.getStatus().equals(RequestStatusToUpdate.CONFIRMED)) {
+        if (event.getConfirmedRequests() + requestsToUpdate.size() > event.getParticipantLimit()
+                && requestStatusUpdateDto.getStatus().equals(RequestStatusToUpdate.CONFIRMED)) {
             throw new ParticipantLimitException("exceeding the limit of participants");
         }
 
@@ -109,13 +117,15 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestDto> getCurrentUserRequests(Long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new UserNotExistException(String.format("User with id=%s was not found", userId)));
+        userRepository.findById(userId).orElseThrow(()
+                -> new UserNotExistException(String.format("User with id=%s was not found", userId)));
         return requestMapper.toRequestDtoList(requestRepository.findAllByRequester(userId));
     }
 
     @Override
     public RequestDto cancelRequests(Long userId, Long requestId) {
-        Request request = requestRepository.findByRequesterAndId(userId, requestId).orElseThrow(() -> new RequestNotExistException(String.format("Request with id=%s was not found", requestId)));
+        Request request = requestRepository.findByRequesterAndId(userId, requestId).orElseThrow(()
+                -> new RequestNotExistException(String.format("Request with id=%s was not found", requestId)));
         request.setStatus(RequestStatus.CANCELED);
         return requestMapper.toRequestDto(requestRepository.save(request));
     }
