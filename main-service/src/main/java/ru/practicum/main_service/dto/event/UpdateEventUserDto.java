@@ -19,11 +19,10 @@ import static ru.practicum.main_service.utility.Constants.DATE;
 @Getter
 @Setter
 public class UpdateEventUserDto {
-    @NotBlank
+
     @Size(min = 20, max = 2000)
     private String annotation;
     private Long category;
-    @NotBlank
     @Size(min = 20, max = 7000)
     private String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE)
