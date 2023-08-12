@@ -5,19 +5,22 @@ import org.springframework.stereotype.Service;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.main_service.entity.Event;
-import ru.practicum.main_service.service.event.EventServiceImpl;
 import ru.practicum.stats_client.StatClient;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static ru.practicum.main_service.utility.Constants.DATE;
 
 @Service
 @RequiredArgsConstructor
 public class StatisticsServiceImpl implements StatisticsService {
 
     private final StatClient statClient;
-
+    private static final String datePattern = DATE;
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern);
 
     @Override
     public void sendStat(Event event, HttpServletRequest request) {
@@ -26,7 +29,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         String nameService = "main-service";
 
         EndpointHitDto requestDto = new EndpointHitDto();
-        requestDto.setTimestamp(now.format(EventServiceImpl.dateFormatter));
+        requestDto.setTimestamp(now.format(dateFormatter));
         requestDto.setUri("/events");
         requestDto.setApp(nameService);
         requestDto.setIp(remoteAddr);
@@ -41,7 +44,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         String nameService = "main-service";
 
         EndpointHitDto requestDto = new EndpointHitDto();
-        requestDto.setTimestamp(now.format(EventServiceImpl.dateFormatter));
+        requestDto.setTimestamp(now.format(dateFormatter));
         requestDto.setUri("/events");
         requestDto.setApp(nameService);
         requestDto.setIp(request.getRemoteAddr());
@@ -53,7 +56,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     public void sendStatForTheEvent(Long eventId, String remoteAddr, LocalDateTime now,
                                     String nameService) {
         EndpointHitDto requestDto = new EndpointHitDto();
-        requestDto.setTimestamp(now.format(EventServiceImpl.dateFormatter));
+        requestDto.setTimestamp(now.format(dateFormatter));
         requestDto.setUri("/events/" + eventId);
         requestDto.setApp(nameService);
         requestDto.setIp(remoteAddr);
@@ -65,7 +68,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                                       String nameService) {
         for (Event event : events) {
             EndpointHitDto requestDto = new EndpointHitDto();
-            requestDto.setTimestamp(now.format(EventServiceImpl.dateFormatter));
+            requestDto.setTimestamp(now.format(dateFormatter));
             requestDto.setUri("/events/" + event.getId());
             requestDto.setApp(nameService);
             requestDto.setIp(remoteAddr);
@@ -75,9 +78,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public void setView(Event event) {
-        String startTime = LocalDateTime.of(
-                1970, 1, 1, 1, 1).format(EventServiceImpl.dateFormatter);
-        String endTime = LocalDateTime.now().format(EventServiceImpl.dateFormatter);
+        String startTime = LocalDateTime.of(1970,1,1,1,1).format(dateFormatter);
+        String endTime = LocalDateTime.now().format(dateFormatter);
         List<String> uris = List.of("/events/" + event.getId());
 
         List<ViewStatsDto> stats = getStats(startTime, endTime, uris);
