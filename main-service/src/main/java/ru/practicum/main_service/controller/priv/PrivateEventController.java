@@ -15,6 +15,8 @@ import ru.practicum.main_service.service.event.EventService;
 import ru.practicum.main_service.service.request.RequestService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -38,8 +40,8 @@ public class PrivateEventController {
     @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> getEventsByUser(
             @PathVariable Long userId,
-            @RequestParam(name = "from", defaultValue = "0", required = false) Integer from,
-            @RequestParam(name = "size", defaultValue = "10", required = false) Integer size) {
+            @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(name = "size", defaultValue = "10") @Positive Integer size) {
         return eventService.getEvents(userId, from, size);
     }
 

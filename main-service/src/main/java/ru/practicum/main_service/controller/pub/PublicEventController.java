@@ -8,6 +8,8 @@ import ru.practicum.main_service.enums.SortValue;
 import ru.practicum.main_service.service.event.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -26,8 +28,8 @@ public class PublicEventController {
             @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
             @RequestParam(name = "onlyAvailable", required = false) boolean onlyAvailable,
             @RequestParam(name = "sort", required = false) SortValue sort,
-            @RequestParam(name = "from", required = false, defaultValue = "0") Integer from,
-            @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(name = "size", defaultValue = "10") @Positive Integer size,
             HttpServletRequest request) {
         return eventService.getEventsWithParamsByUser(
                 text,

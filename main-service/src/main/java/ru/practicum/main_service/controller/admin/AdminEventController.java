@@ -10,6 +10,8 @@ import ru.practicum.main_service.enums.EventState;
 import ru.practicum.main_service.service.event.EventService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -29,13 +31,14 @@ public class AdminEventController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<EventFullDto> getEvents(@RequestParam(name = "users", required = false) List<Long> users,
-                                        @RequestParam(name = "states", required = false) EventState states,
-                                        @RequestParam(name = "categories", required = false) List<Long> categoriesId,
-                                        @RequestParam(name = "rangeStart", required = false) String rangeStart,
-                                        @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
-                                        @RequestParam(name = "from", required = false, defaultValue = "0") Integer from,
-                                        @RequestParam(name = "size", required = false, defaultValue = "10") Integer size) {
+    public List<EventFullDto> getEvents(
+            @RequestParam(name = "users", required = false) List<Long> users,
+            @RequestParam(name = "states", required = false) EventState states,
+            @RequestParam(name = "categories", required = false) List<Long> categoriesId,
+            @RequestParam(name = "rangeStart", required = false) String rangeStart,
+                    @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
+            @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(name = "size", defaultValue = "10") @Positive Integer size) {
         return eventService.getEventsWithParamsByAdmin(users, states, categoriesId, rangeStart, rangeEnd, from, size);
     }
 }
