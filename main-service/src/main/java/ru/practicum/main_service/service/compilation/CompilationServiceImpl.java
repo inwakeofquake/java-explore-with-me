@@ -3,6 +3,7 @@ package ru.practicum.main_service.service.compilation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main_service.dto.compilation.CompilationDto;
 import ru.practicum.main_service.dto.compilation.NewCompilationDto;
 import ru.practicum.main_service.dto.compilation.UpdateCompilationRequest;
@@ -19,7 +20,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +28,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class CompilationServiceImpl implements CompilationService {
     private final EventRepository eventRepository;
     private final EventService eventService;

@@ -36,6 +36,7 @@ import static ru.practicum.main_service.utility.Constants.DATE;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
