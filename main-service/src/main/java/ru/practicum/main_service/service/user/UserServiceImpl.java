@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main_service.dto.user.UserDto;
-import ru.practicum.main_service.exceptions.NameAlreadyExistException;
+import ru.practicum.main_service.exceptions.ConflictException;
 import ru.practicum.main_service.mapper.UserMapper;
 import ru.practicum.main_service.repository.UserRepository;
 
@@ -26,10 +26,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) {
-        if (userRepository.existsByName(userDto.getName())) {
+        if (Boolean.TRUE.equals(userRepository.existsByName(userDto.getName()))) {
             log.warn(String.format(
                     "Can't create user with name: %s, the name was used by another user", userDto.getName()));
-            throw new NameAlreadyExistException(String.format(
+            throw new ConflictException(String.format(
                     "Can't create user with name: %s, the name was used by another user",
                     userDto.getName()));
         }

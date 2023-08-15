@@ -8,9 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main_service.dto.category.CategoryDto;
 import ru.practicum.main_service.dto.category.NewCategoryDto;
 import ru.practicum.main_service.entity.Category;
-import ru.practicum.main_service.exceptions.CategoryIsNotEmptyException;
-import ru.practicum.main_service.exceptions.CategoryNotExistException;
-import ru.practicum.main_service.exceptions.NameAlreadyExistException;
+import ru.practicum.main_service.exceptions.ConflictException;
+import ru.practicum.main_service.exceptions.NotFoundException;
 import ru.practicum.main_service.mapper.CategoryMapper;
 import ru.practicum.main_service.repository.CategoryRepository;
 import ru.practicum.main_service.repository.EventRepository;
@@ -29,7 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
         if (categoryRepository.existsByName(newCategoryDto.getName())) {
-            throw new NameAlreadyExistException(String.format("Can't create category because name: %s already used by another category", newCategoryDto.getName()));
+            throw new ConflictException("Can't create category, name already used by another category");
         }
         return categoryMapper.toCategoryDto(categoryRepository.save(categoryMapper.toCategory(newCategoryDto)));
     }
@@ -43,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getCategory(Long catId) {
         Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new CategoryNotExistException("Category doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Category doesn't exist because ID is not found."));
         return categoryMapper.toCategoryDto(category);
     }
 
@@ -51,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategory(Long catId) {
         if (eventRepository.existsByCategoryId(catId)) {
-            throw new CategoryIsNotEmptyException("The category is not empty");
+            throw new ConflictException("The category is not empty, category ID not found");
         }
         categoryRepository.deleteById(catId);
     }
@@ -60,9 +59,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new CategoryNotExistException("Category doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Category doesn't exist, Category ID not found"));
         if (!category.getName().equals(categoryDto.getName()) && categoryRepository.existsByName(categoryDto.getName())) {
-            throw new NameAlreadyExistException(String.format("Can't update category because name: %s already used by another category", categoryDto.getName()));
+            throw new ConflictException("Can't update category, name: already used");
         }
         category.setName(categoryDto.getName());
         return categoryMapper.toCategoryDto(categoryRepository.save(category));

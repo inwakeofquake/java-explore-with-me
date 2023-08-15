@@ -9,7 +9,7 @@ import ru.practicum.main_service.dto.compilation.NewCompilationDto;
 import ru.practicum.main_service.dto.compilation.UpdateCompilationRequest;
 import ru.practicum.main_service.entity.Compilation;
 import ru.practicum.main_service.entity.Event;
-import ru.practicum.main_service.exceptions.CompilationNotExistException;
+import ru.practicum.main_service.exceptions.NotFoundException;
 import ru.practicum.main_service.mapper.CompilationMapper;
 import ru.practicum.main_service.repository.CompilationRepository;
 import ru.practicum.main_service.repository.EventRepository;
@@ -56,7 +56,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     public CompilationDto getCompilation(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new CompilationNotExistException("Compilation doesn't exist"));
+                .orElseThrow(() -> new NotFoundException("Compilation doesn't exist"));
         return mapper.mapToCompilationDto(compilation);
     }
 
@@ -90,7 +90,8 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest updateCompilationRequest) {
 
-        Compilation oldCompilation = compilationRepository.findById(compId).orElseThrow(() -> new CompilationNotExistException("Can't update compilation - the compilation doesn't exist"));
+        Compilation oldCompilation = compilationRepository.findById(compId).orElseThrow(()
+                -> new NotFoundException("Can't update compilation - the compilation doesn't exist"));
         List<Long> eventsIds = updateCompilationRequest.getEvents();
         if (eventsIds != null) {
             List<Event> events = eventRepository.findAllByIdIn(updateCompilationRequest.getEvents());

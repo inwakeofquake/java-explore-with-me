@@ -10,7 +10,8 @@ import ru.practicum.main_service.entity.Event;
 import ru.practicum.main_service.entity.Request;
 import ru.practicum.main_service.enums.RequestStatus;
 import ru.practicum.main_service.enums.RequestStatusToUpdate;
-import ru.practicum.main_service.exceptions.*;
+import ru.practicum.main_service.exceptions.ConflictException;
+import ru.practicum.main_service.exceptions.NotFoundException;
 import ru.practicum.main_service.mapper.RequestMapper;
 import ru.practicum.main_service.repository.EventRepository;
 import ru.practicum.main_service.repository.RequestRepository;
@@ -36,23 +37,23 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public RequestDto createRequest(Long userId, Long eventId) {
-        if (requestRepository.existsByRequesterAndEvent(userId, eventId)) {
-            throw new RequestAlreadyExistException("Request already exists");
+        if (Boolean.TRUE.equals(requestRepository.existsByRequesterAndEvent(userId, eventId))) {
+            throw new ConflictException("Request already exists");
         }
         Event event = eventRepository.findById(eventId).orElseThrow(()
-                -> new EventNotExistException("Event doesnt exist"));
+                -> new NotFoundException("Event not found"));
         if (event.getInitiator().getId().equals(userId)) {
-            throw new WrongUserException("Can't create request by initiator");
+            throw new ConflictException("Can't create request by initiator");
         }
 
         if (event.getPublishedOn() == null) {
-            throw new EventIsNotPublishedException("Event is not published yet");
+            throw new ConflictException("Event is not published yet");
         }
 
         List<Request> requests = requestRepository.findAllByEvent(eventId);
 
-        if (!event.getRequestModeration() && requests.size() >= event.getParticipantLimit()) {
-            throw new ParticipantLimitException("Member limit exceeded ");
+        if (Boolean.TRUE.equals(!event.getRequestModeration()) && requests.size() >= event.getParticipantLimit()) {
+            throw new ConflictException("Member limit exceeded ");
         }
 
         Request request = new Request();
@@ -71,10 +72,10 @@ public class RequestServiceImpl implements RequestService {
             Long eventId,
             RequestStatusUpdateDto requestStatusUpdateDto) {
         Event event = eventRepository.findById(eventId).orElseThrow(()
-                -> new EventNotExistException("Event doesn't exist"));
+                -> new NotFoundException("Event doesn't exist"));
         RequestStatusUpdateResult result = new RequestStatusUpdateResult();
 
-        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
+        if (Boolean.TRUE.equals(!event.getRequestModeration()) || event.getParticipantLimit() == 0) {
             return result;
         }
 
@@ -85,12 +86,12 @@ public class RequestServiceImpl implements RequestService {
 
         if (requestsToUpdate.stream().anyMatch(request -> request.getStatus().equals(RequestStatus.CONFIRMED)
                 && requestStatusUpdateDto.getStatus().equals(RequestStatusToUpdate.REJECTED))) {
-            throw new RequestAlreadyConfirmedException("request already confirmed");
+            throw new ConflictException("Request already confirmed");
         }
 
         if (event.getConfirmedRequests() + requestsToUpdate.size() > event.getParticipantLimit()
                 && requestStatusUpdateDto.getStatus().equals(RequestStatusToUpdate.CONFIRMED)) {
-            throw new ParticipantLimitException("exceeding the limit of participants");
+            throw new ConflictException("Limit of participants exceeded");
         }
 
         for (Request request : requestsToUpdate) {
@@ -119,14 +120,14 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<RequestDto> getCurrentUserRequests(Long userId) {
         userRepository.findById(userId).orElseThrow(()
-                -> new UserNotExistException(String.format("User with id=%s was not found", userId)));
+                -> new NotFoundException(String.format("User with id=%s was not found", userId)));
         return requestMapper.toRequestDtoList(requestRepository.findAllByRequester(userId));
     }
 
     @Override
     public RequestDto cancelRequests(Long userId, Long requestId) {
         Request request = requestRepository.findByRequesterAndId(userId, requestId).orElseThrow(()
-                -> new RequestNotExistException(String.format("Request with id=%s was not found", requestId)));
+                -> new NotFoundException(String.format("Request with id=%s was not found", requestId)));
         request.setStatus(RequestStatus.CANCELED);
         return requestMapper.toRequestDto(requestRepository.save(request));
     }
