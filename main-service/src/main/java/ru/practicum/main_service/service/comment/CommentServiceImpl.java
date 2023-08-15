@@ -45,10 +45,10 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto createComment(NewCommentDto newCommentDto, Long userId, Long eventId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format(
-                        "Can't create comment, user with id=%s doesn't exist", userId)));
+                        "Can't create comment, user with id=%s not found", userId)));
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format(
-                        "Can't create comment, event with id=%s doesn't exist", eventId)));
+                        "Can't create comment, event with id=%s not found", eventId)));
 
         Comment comment = new Comment();
         comment.setAuthor(user);
@@ -64,10 +64,10 @@ public class CommentServiceImpl implements CommentService {
         Comment oldComment = commentsRepository.findById(commentId).orElseThrow(() -> new NotFoundException(
                 "Can't update comment, comment doesn't exist"));
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("Can't delete comment, if user doesn't exist");
+            throw new NotFoundException("Can't delete comment, user not found");
         }
         if (!oldComment.getAuthor().getId().equals(userId)) {
-            throw new ConflictException("Can't delete comment, if his owner another user");
+            throw new ConflictException("Can't delete comment, must be owner");
         }
         oldComment.setText(newCommentDto.getText());
         Comment savedComment = commentsRepository.save(oldComment);
@@ -79,7 +79,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public CommentDto updateCommentByAdmin(NewCommentDto newCommentDto, Long commentId) {
         Comment oldComment = commentsRepository.findById(commentId).orElseThrow(() -> new NotFoundException(
-                "Can't update comment, comment doesn't exist"));
+                "Can't update comment, comment not found"));
         oldComment.setText(newCommentDto.getText());
         Comment savedComment = commentsRepository.save(oldComment);
         log.debug(COMMENT_UPDATED, commentId);
@@ -91,11 +91,11 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentsRepository.findById(commentId).orElseThrow(() -> new NotFoundException(
                 "Can't get comment"));
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("Can't get comment, if user doesn't exist");
+            throw new NotFoundException("Can't get comment, user not found");
         }
 
         if (!userId.equals(comment.getAuthor().getId())) {
-            throw new ConflictException("Can't get comment created by another user");
+            throw new ConflictException("Can't get comment, must be owner");
         }
         log.debug("Get comment with ID = {}", commentId);
         return commentMapper.toCommentDto(comment);
@@ -135,7 +135,7 @@ public class CommentServiceImpl implements CommentService {
                 .setFirstResult(from)
                 .setMaxResults(size)
                 .getResultList();
-        log.debug("Get comment`s list of user with ID = {}", userId);
+        log.debug("Get list of comments for user with ID {}", userId);
         return commentMapper.toCommentDtos(comments);
     }
 

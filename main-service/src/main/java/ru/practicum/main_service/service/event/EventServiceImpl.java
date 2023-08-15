@@ -80,7 +80,7 @@ public class EventServiceImpl implements EventService {
             return eventMapper.toEventFullDto(event);
         }
 
-        if (updateEventAdminDto.getAnnotation() != null) {
+        if (updateEventAdminDto.getAnnotation() != null && !updateEventAdminDto.getAnnotation().isBlank()) {
             event.setAnnotation(updateEventAdminDto.getAnnotation());
         }
         if (updateEventAdminDto.getCategory() != null) {
@@ -88,7 +88,7 @@ public class EventServiceImpl implements EventService {
                     .orElseThrow(() -> new NotFoundException("Category not found"));
             event.setCategory(category);
         }
-        if (updateEventAdminDto.getDescription() != null) {
+        if (updateEventAdminDto.getDescription() != null && !updateEventAdminDto.getDescription().isBlank()) {
             event.setDescription(updateEventAdminDto.getDescription());
         }
         if (updateEventAdminDto.getLocation() != null) {
@@ -103,7 +103,7 @@ public class EventServiceImpl implements EventService {
         if (updateEventAdminDto.getRequestModeration() != null) {
             event.setRequestModeration(updateEventAdminDto.getRequestModeration());
         }
-        if (updateEventAdminDto.getTitle() != null) {
+        if (updateEventAdminDto.getTitle() != null && !updateEventAdminDto.getTitle().isBlank()) {
             event.setTitle(updateEventAdminDto.getTitle());
         }
         if (updateEventAdminDto.getStateAction() != null) {
@@ -150,7 +150,7 @@ public class EventServiceImpl implements EventService {
             return eventMapper.toEventFullDto(event);
         }
 
-        if (updateEventUserDto.getAnnotation() != null) {
+        if (updateEventUserDto.getAnnotation() != null && !updateEventUserDto.getAnnotation().isBlank()) {
             event.setAnnotation(updateEventUserDto.getAnnotation());
         }
         if (updateEventUserDto.getCategory() != null) {
@@ -158,7 +158,7 @@ public class EventServiceImpl implements EventService {
                     -> new NotFoundException("Category not found"));
             event.setCategory(category);
         }
-        if (updateEventUserDto.getDescription() != null) {
+        if (updateEventUserDto.getDescription() != null && !updateEventUserDto.getDescription().isBlank()) {
             event.setDescription(updateEventUserDto.getDescription());
         }
         if (updateEventUserDto.getEventDate() != null) {
@@ -181,7 +181,7 @@ public class EventServiceImpl implements EventService {
         if (updateEventUserDto.getRequestModeration() != null) {
             event.setRequestModeration(updateEventUserDto.getRequestModeration());
         }
-        if (updateEventUserDto.getTitle() != null) {
+        if (updateEventUserDto.getTitle() != null && !updateEventUserDto.getTitle().isBlank()) {
             event.setTitle(updateEventUserDto.getTitle());
         }
 
@@ -273,7 +273,7 @@ public class EventServiceImpl implements EventService {
         Root<Event> root = query.from(Event.class);
         Predicate criteria = builder.conjunction();
 
-        if (text != null) {
+        if (text != null && !text.isBlank()) {
             Predicate annotationContain = builder.like(builder.lower(root.get("annotation")),
                     "%" + text.toLowerCase() + "%");
             Predicate descriptionContain = builder.like(builder.lower(root.get("description")),
