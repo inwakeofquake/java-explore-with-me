@@ -19,8 +19,7 @@ import static ru.practicum.main_service.utility.Constants.DATE;
 public class StatisticsServiceImpl implements StatisticsService {
 
     private final StatClient statClient;
-    private static final String datePattern = DATE;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern);
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE);
 
     @Override
     public void sendStat(Event event, HttpServletRequest request) {

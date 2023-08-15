@@ -27,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
-        if (categoryRepository.existsByName(newCategoryDto.getName())) {
+        if (Boolean.TRUE.equals(categoryRepository.existsByName(newCategoryDto.getName()))) {
             throw new ConflictException("Can't create category, name already used by another category");
         }
         return categoryMapper.toCategoryDto(categoryRepository.save(categoryMapper.toCategory(newCategoryDto)));
@@ -49,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void deleteCategory(Long catId) {
-        if (eventRepository.existsByCategoryId(catId)) {
+        if (Boolean.TRUE.equals(eventRepository.existsByCategoryId(catId))) {
             throw new ConflictException("The category is not empty, category ID not found");
         }
         categoryRepository.deleteById(catId);
@@ -60,7 +60,8 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto updateCategory(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Category doesn't exist, Category ID not found"));
-        if (!category.getName().equals(categoryDto.getName()) && categoryRepository.existsByName(categoryDto.getName())) {
+        if (!category.getName().equals(categoryDto.getName())
+                && Boolean.TRUE.equals(categoryRepository.existsByName(categoryDto.getName()))) {
             throw new ConflictException("Can't update category, name: already used");
         }
         category.setName(categoryDto.getName());

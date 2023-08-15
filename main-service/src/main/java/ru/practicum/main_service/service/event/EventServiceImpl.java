@@ -44,10 +44,8 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final EventMapper eventMapper;
     private final UserRepository userRepository;
-
     private final EntityManager entityManager;
-    private final String datePattern = DATE;
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern);
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE);
     private final StatisticsService statisticsService;
 
     @Override
@@ -135,7 +133,7 @@ public class EventServiceImpl implements EventService {
             event.setEventDate(updateEventAdminDto.getEventDate());
         }
 
-        return eventMapper.toEventFullDto(eventRepository.save(event));
+        return eventMapper.toEventFullDto(event);
     }
 
     @Override
@@ -195,7 +193,7 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        return eventMapper.toEventFullDto(eventRepository.save(event));
+        return eventMapper.toEventFullDto(event);
     }
 
     @Override
