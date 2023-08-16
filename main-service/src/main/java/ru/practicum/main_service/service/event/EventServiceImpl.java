@@ -1,6 +1,7 @@
 package ru.practicum.main_service.service.event;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.main_service.utility.Constants.DATE;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -51,32 +53,81 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
+        log.info("Attempting to create an event for user with ID: {}", userId);
+
         Category category = categoryRepository.findById(newEventDto.getCategory())
-                .orElseThrow(() -> new NotFoundException("Category not found"));
+                .orElseThrow(() -> {
+                    log.error("Category with ID {} not found", newEventDto.getCategory());
+                    return new NotFoundException("Category not found");
+                });
+
         LocalDateTime eventDate = newEventDto.getEventDate();
         if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
+            log.error("Provided eventDate {} is not in the future.", eventDate);
             throw new BadRequestException("Field: eventDate. Error: must have date in the future. Value:" + eventDate);
         }
+
         Event event = eventMapper.toEventModel(newEventDto);
         event.setCategory(category);
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("Can't create event, the user with id = %s doesn't exist", userId)));
+                .orElseThrow(() -> {
+                    log.error("Cannot create event, user with ID {} doesn't exist", userId);
+                    return new NotFoundException(String.format("Can't create event, the user with id = %s doesn't exist", userId));
+                });
+
         event.setInitiator(user);
-        return eventMapper.toEventFullDto(eventRepository.save(event));
+        EventFullDto result = eventMapper.toEventFullDto(eventRepository.save(event));
+
+        log.info("Event created successfully for user with ID: {}", userId);
+        return result;
+    }
+
+    @Override
+    public EventFullDto getEvent(Long id, HttpServletRequest request) {
+        log.info("Fetching event by id: {}", id);
+        Event event = eventRepository.findByIdAndPublishedOnIsNotNull(id)
+                .orElseThrow(() -> {
+                    log.warn("Event with id={} not found or not published", id);
+                    return new NotFoundException(String.format("Can't find event with id = %s event doesn't exist", id));
+                });
+        statisticsService.setView(event);
+        statisticsService.sendStat(event, request);
+        return eventMapper.toEventFullDto(event);
     }
 
     @Override
     public List<EventShortDto> getEvents(Long userId, Integer from, Integer size) {
+        log.info("Fetching events for user={}, from={}, size={}", userId, from, size);
         Pageable page = PageRequest.of(from / size, size);
-        return eventMapper.toEventShortDtoList(eventRepository.findAllByInitiatorId(userId, page).toList());
+        List<EventShortDto> results = eventMapper.toEventShortDtoList(eventRepository.findAllByInitiatorId(userId, page).toList());
+        log.info("Fetched {} events for user={}", results.size(), userId);
+        return results;
+    }
+
+    @Override
+    public EventFullDto getEventByUser(Long userId, Long eventId) {
+        log.info("Fetching event with id={} for user={}", eventId, userId);
+        return eventMapper.toEventFullDto(eventRepository.findByIdAndInitiatorId(eventId, userId)
+                .orElseThrow(() -> {
+                    log.warn("Event with id={} not found for user={}", eventId, userId);
+                    return new NotFoundException("Event not found");
+                }));
     }
 
     @Override
     @Transactional
     public EventFullDto updateEvent(Long eventId, UpdateEventAdminDto updateEventAdminDto) {
+        log.info("Attempting to update an event with ID: {}", eventId);
+
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException(String.format("Can't update event with id = %s", eventId)));
+                .orElseThrow(() -> {
+                    log.error("Event with ID {} not found", eventId);
+                    return new NotFoundException(String.format("Can't update event with id = %s", eventId));
+                });
+
         if (updateEventAdminDto == null) {
+            log.warn("Received null UpdateEventAdminDto for event with ID: {}. No update performed.", eventId);
             return eventMapper.toEventFullDto(event);
         }
 
@@ -109,6 +160,7 @@ public class EventServiceImpl implements EventService {
         if (updateEventAdminDto.getStateAction() != null) {
             if (updateEventAdminDto.getStateAction().equals(StateActionForAdmin.PUBLISH_EVENT)) {
                 if (event.getPublishedOn() != null) {
+                    log.warn("Attempt to publish an already published event with ID: {}", eventId);
                     throw new ConflictException("Event already published");
                 }
                 if (event.getState().equals(EventState.CANCELED)) {
@@ -127,26 +179,35 @@ public class EventServiceImpl implements EventService {
             LocalDateTime eventDateTime = updateEventAdminDto.getEventDate();
             if (eventDateTime.isBefore(LocalDateTime.now())
                     || (event.getPublishedOn() != null && eventDateTime.isBefore(event.getPublishedOn().plusHours(1)))) {
+                log.warn("Invalid event date provided for event with ID: {}", eventId);
                 throw new BadRequestException("The start date of the event to be modified is less than one hour from the publication date.");
             }
 
             event.setEventDate(updateEventAdminDto.getEventDate());
         }
 
+        log.info("Event with ID: {} updated successfully", eventId);
         return eventMapper.toEventFullDto(event);
     }
 
     @Override
     @Transactional
     public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserDto updateEventUserDto) {
+        log.info("User with ID: {} attempting to update event with ID: {}", userId, eventId);
+
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
+                .orElseThrow(() -> {
+                    log.error("Event with ID: {} for User with ID: {} not found", eventId, userId);
+                    return new NotFoundException("Event not found");
+                });
 
         if (event.getPublishedOn() != null) {
+            log.warn("Attempt to update an already published event with ID: {}", eventId);
             throw new ConflictException("Event already published");
         }
 
         if (updateEventUserDto == null) {
+            log.warn("Received null UpdateEventUserDto for event with ID: {}. No update performed.", eventId);
             return eventMapper.toEventFullDto(event);
         }
 
@@ -187,28 +248,30 @@ public class EventServiceImpl implements EventService {
 
         if (updateEventUserDto.getStateAction() != null) {
             if (updateEventUserDto.getStateAction().equals(StateActionForUser.SEND_TO_REVIEW)) {
+                log.info("User with ID: {} sets event with ID: {} to PENDING state", userId, eventId);
                 event.setState(EventState.PENDING);
             } else {
+                log.info("User with ID: {} sets event with ID: {} to CANCELED state", userId, eventId);
                 event.setState(EventState.CANCELED);
             }
         }
 
+        log.info("Event with ID: {} updated successfully by user with ID: {}", eventId, userId);
         return eventMapper.toEventFullDto(event);
-    }
-
-    @Override
-    public EventFullDto getEventByUser(Long userId, Long eventId) {
-        return eventMapper.toEventFullDto(eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event not found")));
     }
 
     @Override
     public List<EventFullDto> getEventsWithParamsByAdmin(List<Long> users, EventState states, List<Long> categoriesId,
                                                          String rangeStart, String rangeEnd, Integer from, Integer size) {
+
+        log.info("Fetching events with parameters: users={}, states={}, categoriesId={}, rangeStart={}, rangeEnd={}, from={}, size={}",
+                users, states, categoriesId, rangeStart, rangeEnd, from, size);
+
         LocalDateTime start = rangeStart != null ? LocalDateTime.parse(rangeStart, dateFormatter) : null;
         LocalDateTime end = rangeEnd != null ? LocalDateTime.parse(rangeEnd, dateFormatter) : null;
 
         if (start != null && end != null && end.isBefore(start)) {
+            log.warn("Invalid date range provided: START={} cannot be after END={}", start, end);
             throw new BadRequestException("START cannot be after END");
         }
 
@@ -249,21 +312,29 @@ public class EventServiceImpl implements EventService {
                 .getResultList();
 
         if (events.isEmpty()) {
+            log.info("No events found for provided parameters.");
             return new ArrayList<>();
         }
 
         setView(events);
-        return eventMapper.toEventFullDtoList(events);
+
+        List<EventFullDto> result = eventMapper.toEventFullDtoList(events);
+        log.info("Fetched {} events for provided parameters.", result.size());
+        return result;
     }
 
     @Override
     public List<EventFullDto> getEventsWithParamsByUser(String text, List<Long> categories, Boolean paid, String rangeStart,
                                                         String rangeEnd, boolean onlyAvailable, SortValue sort,
                                                         Integer from, Integer size, HttpServletRequest request) {
+        log.info("Fetching events for user with parameters: text={}, categories={}, paid={}, rangeStart={}, rangeEnd={}, onlyAvailable={}, sort={}, from={}, size={}",
+                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+
         LocalDateTime start = rangeStart != null ? LocalDateTime.parse(rangeStart, dateFormatter) : null;
         LocalDateTime end = rangeEnd != null ? LocalDateTime.parse(rangeEnd, dateFormatter) : null;
 
         if (start != null && end != null && end.isBefore(start)) {
+            log.warn("Invalid date range provided: Range end={} cannot be before range start={}", end, start);
             throw new BadRequestException("Range end cannot be before range start");
         }
 
@@ -328,22 +399,16 @@ public class EventServiceImpl implements EventService {
         }
 
         if (events.isEmpty()) {
+            log.info("No events found for provided user parameters.");
             return new ArrayList<>();
         }
 
         setView(events);
         statisticsService.sendStat(events, request);
-        return eventMapper.toEventFullDtoList(events);
-    }
 
-    @Override
-    public EventFullDto getEvent(Long id, HttpServletRequest request) {
-        Event event = eventRepository.findByIdAndPublishedOnIsNotNull(id)
-                .orElseThrow(() -> new NotFoundException(String.format(
-                        "Can't find event with id = %s event doesn't exist", id)));
-        statisticsService.setView(event);
-        statisticsService.sendStat(event, request);
-        return eventMapper.toEventFullDto(event);
+        List<EventFullDto> result = eventMapper.toEventFullDtoList(events);
+        log.info("Fetched {} events for provided user parameters.", result.size());
+        return result;
     }
 
     @Override

@@ -110,8 +110,6 @@ public class CompilationServiceImpl implements CompilationService {
             oldCompilation.setTitle(updateCompilationRequest.getTitle());
         }
         Compilation updatedCompilation = compilationRepository.save(oldCompilation);
-        log.debug("Compilation with ID = {} is updated", compId);
-        setView(updatedCompilation);
 
         log.info("Compilation with ID = {} is updated", compId);
         setView(updatedCompilation);
