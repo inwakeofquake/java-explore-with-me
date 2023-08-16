@@ -80,16 +80,17 @@ public class CommentServiceImpl implements CommentService {
             log.error("Error updating comment: user with id={} not found", userId);
             throw new NotFoundException("Can't update comment, user not found");
         }
+
         if (!oldComment.getAuthor().getId().equals(userId)) {
             log.error("Error updating comment: user with id={} is not the owner of the comment with id={}", userId, commentId);
             throw new ConflictException("Can't update comment, must be owner");
         }
+
         oldComment.setText(newCommentDto.getText());
-        Comment savedComment = commentsRepository.save(oldComment);
 
         log.info("Comment with ID={} successfully updated by user with ID={}", commentId, userId);
 
-        return commentMapper.toCommentDto(savedComment);
+        return commentMapper.toCommentDto(oldComment);
     }
 
     @Override
