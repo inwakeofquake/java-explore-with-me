@@ -49,14 +49,18 @@ public class CompilationServiceImpl implements CompilationService {
         compilation.setTitle(newCompilationDto.getTitle());
 
         Compilation savedCompilation = compilationRepository.save(compilation);
-        log.debug("Compilation is created");
+        log.info("Compilation with title {} is created", newCompilationDto.getTitle());
         setView(savedCompilation);
         return mapper.mapToCompilationDto(savedCompilation);
     }
 
     public CompilationDto getCompilation(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Compilation doesn't exist"));
+                .orElseThrow(() -> {
+                    log.error("Error fetching compilation with id={}: Compilation doesn't exist", compId);
+                    return new NotFoundException("Compilation doesn't exist");
+                });
+        log.info("Fetched compilation with ID = {}", compId);
         return mapper.mapToCompilationDto(compilation);
     }
 
@@ -84,6 +88,8 @@ public class CompilationServiceImpl implements CompilationService {
                 .setMaxResults(size)
                 .getResultList();
 
+        log.info("Fetched compilations, pinned status: {}", pinned);
+
         return mapper.mapToListCompilationDto(compilations);
     }
 
@@ -106,13 +112,21 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation updatedCompilation = compilationRepository.save(oldCompilation);
         log.debug("Compilation with ID = {} is updated", compId);
         setView(updatedCompilation);
+
+        log.info("Compilation with ID = {} is updated", compId);
+        setView(updatedCompilation);
+
         return mapper.mapToCompilationDto(updatedCompilation);
     }
 
     @Transactional
     public void deleteCompilation(Long compId) {
+        if (!compilationRepository.existsById(compId)) {
+            log.error("Error deleting compilation with id={}: Compilation doesn't exist", compId);
+            throw new NotFoundException("Compilation doesn't exist");
+        }
         compilationRepository.deleteById(compId);
-        log.debug("Compilation with ID = {} is deleted", compId);
+        log.info("Compilation with ID = {} is deleted", compId);
     }
 
     private void setView(Compilation compilation) {

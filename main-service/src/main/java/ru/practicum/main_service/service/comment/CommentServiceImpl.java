@@ -44,34 +44,51 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public CommentDto createComment(NewCommentDto newCommentDto, Long userId, Long eventId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(String.format(
-                        "Can't create comment, user with id=%s not found", userId)));
+                .orElseThrow(() -> {
+                    log.error("Error creating comment: user with id={} not found", userId);
+                    return new NotFoundException(String.format(
+                            "Can't create comment, user with id=%s not found", userId));
+                });
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException(String.format(
-                        "Can't create comment, event with id=%s not found", eventId)));
+                .orElseThrow(() -> {
+                    log.error("Error creating comment: event with id={} not found", eventId);
+                    return new NotFoundException(String.format(
+                            "Can't create comment, event with id=%s not found", eventId));
+                });
 
         Comment comment = new Comment();
         comment.setAuthor(user);
         comment.setEvent(event);
         comment.setCreated(LocalDateTime.now());
         comment.setText(newCommentDto.getText());
-        return commentMapper.toCommentDto(commentsRepository.save(comment));
+        Comment savedComment = commentsRepository.save(comment);
+
+        log.info("Comment successfully created by user with ID={} for event with ID={}", userId, eventId);
+
+        return commentMapper.toCommentDto(savedComment);
     }
 
     @Override
     @Transactional
     public CommentDto updateCommentByUser(NewCommentDto newCommentDto, Long userId, Long commentId) {
-        Comment oldComment = commentsRepository.findById(commentId).orElseThrow(() -> new NotFoundException(
-                "Can't update comment, comment doesn't exist"));
+        Comment oldComment = commentsRepository.findById(commentId).orElseThrow(() -> {
+            log.error("Error updating comment: comment with id={} doesn't exist", commentId);
+            return new NotFoundException("Can't update comment, comment doesn't exist");
+        });
+
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("Can't delete comment, user not found");
+            log.error("Error updating comment: user with id={} not found", userId);
+            throw new NotFoundException("Can't update comment, user not found");
         }
         if (!oldComment.getAuthor().getId().equals(userId)) {
-            throw new ConflictException("Can't delete comment, must be owner");
+            log.error("Error updating comment: user with id={} is not the owner of the comment with id={}", userId, commentId);
+            throw new ConflictException("Can't update comment, must be owner");
         }
         oldComment.setText(newCommentDto.getText());
         Comment savedComment = commentsRepository.save(oldComment);
-        log.debug(COMMENT_UPDATED, commentId);
+
+        log.info("Comment with ID={} successfully updated by user with ID={}", commentId, userId);
+
         return commentMapper.toCommentDto(savedComment);
     }
 
@@ -82,14 +99,17 @@ public class CommentServiceImpl implements CommentService {
                 "Can't update comment, comment not found"));
         oldComment.setText(newCommentDto.getText());
         Comment savedComment = commentsRepository.save(oldComment);
-        log.debug(COMMENT_UPDATED, commentId);
+        log.info(COMMENT_UPDATED, commentId);
         return commentMapper.toCommentDto(savedComment);
     }
 
     @Override
     public CommentDto getCommentsByIdByUser(Long userId, Long commentId) {
-        Comment comment = commentsRepository.findById(commentId).orElseThrow(() -> new NotFoundException(
-                "Can't get comment"));
+        Comment comment = commentsRepository.findById(commentId).orElseThrow(() -> {
+            log.error("Error getting comment");
+            return new NotFoundException("Can't get comment");
+        });
+
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Can't get comment, user not found");
         }
@@ -97,7 +117,7 @@ public class CommentServiceImpl implements CommentService {
         if (!userId.equals(comment.getAuthor().getId())) {
             throw new ConflictException("Can't get comment, must be owner");
         }
-        log.debug("Get comment with ID = {}", commentId);
+        log.info("Get comment with ID = {}", commentId);
         return commentMapper.toCommentDto(comment);
     }
 
@@ -108,7 +128,6 @@ public class CommentServiceImpl implements CommentService {
             LocalDateTime createEnd,
             Integer from,
             Integer size) {
-        userRepository.findById(userId);
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Comment> query = builder.createQuery(Comment.class);
@@ -116,6 +135,7 @@ public class CommentServiceImpl implements CommentService {
         Root<Comment> root = query.from(Comment.class);
 
         if (createStart != null && createEnd != null && createEnd.isBefore(createStart)) {
+            log.error("Error fetching comments: Comment createEnd must be after createStart");
             throw new BadRequestException("Comment createEnd must be after createStart");
         }
 
@@ -135,15 +155,17 @@ public class CommentServiceImpl implements CommentService {
                 .setFirstResult(from)
                 .setMaxResults(size)
                 .getResultList();
-        log.debug("Get list of comments for user with ID {}", userId);
+        log.info("Get list of comments for user with ID {}", userId);
         return commentMapper.toCommentDtos(comments);
     }
 
     @Override
     @Transactional
     public void deleteCommentByUser(Long userId, Long commentId) {
-        Comment comment = commentsRepository.findById(commentId).orElseThrow(() -> new NotFoundException(
-                "Can't delete comment, if his owner another user or user/comment doesn't exist"));
+        Comment comment = commentsRepository.findById(commentId).orElseThrow(() -> {
+            log.error("Error deleting comment: comment doesn't exist or owner mismatch");
+            return new NotFoundException("Can't delete comment, if his owner another user or user/comment doesn't exist");
+        });
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Can't delete comment, if user doesn't exist");
         }
@@ -151,33 +173,49 @@ public class CommentServiceImpl implements CommentService {
         if (!comment.getAuthor().getId().equals(userId)) {
             throw new ConflictException("Can't delete comment, if his owner another user");
         }
-        log.debug("Comment with ID = {} was delete", commentId);
+        log.info("Comment with ID = {} was delete", commentId);
         commentsRepository.delete(comment);
     }
 
     @Override
     public List<CommentDto> getCommentsByEventIdByAdmin(Long eventId, Integer from, Integer size) {
-        eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException(String.format(
-                "Can't receive comment by id, event with id=%s doesn't exist", eventId)));
+        if (!eventRepository.existsById(eventId)) {
+            log.error("Error fetching comments by event id: event with id={} doesn't exist", eventId);
+            throw new NotFoundException(String.format("Can't receive comment by id, event with id=%s doesn't exist", eventId));
+        }
+
         Pageable page = PageRequest.of(from / size, size);
         List<Comment> eventComments = commentsRepository.findAllByEventId(eventId, page);
-        log.debug("Get comment`s list of event with ID = {}", eventId);
+
+        log.info("Retrieved comment list for event with ID = {}", eventId);
+
         return commentMapper.toCommentDtos(eventComments);
     }
+
 
     @Override
     public CommentDto getCommentsByIdByAdmin(Long commentId) {
         Comment comment = commentsRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("Can't receive comment by id, the comment with id=%s doesn't exist", commentId)));
-        log.debug("Comment with ID = {} was found", commentId);
+                .orElseThrow(() -> {
+                    log.error("Error fetching comment by id: comment with id={} doesn't exist", commentId);
+                    return new NotFoundException(String.format("Can't receive comment by id, the comment with id=%s doesn't exist", commentId));
+                });
+
+        log.info("Comment with ID = {} was found", commentId);
         return commentMapper.toCommentDto(comment);
     }
 
     @Override
     @Transactional
     public void deleteCommentByAdmin(Long commentId) {
+        if (!commentsRepository.existsById(commentId)) {
+            log.error("Error deleting comment: comment with id={} doesn't exist", commentId);
+            throw new NotFoundException(String.format("Can't delete comment, comment with id=%s doesn't exist", commentId));
+        }
+
         commentsRepository.deleteById(commentId);
-        log.debug("Comment with ID = {} was delete", commentId);
+
+        log.info("Comment with ID = {} was deleted", commentId);
     }
+
 }
