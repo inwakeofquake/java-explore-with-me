@@ -81,6 +81,6 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ConflictException("Can't update category, name: already used");
         }
         category.setName(categoryDto.getName());
-        return categoryMapper.toCategoryDto(categoryRepository.save(category));
+        return categoryMapper.toCategoryDto(category);
     }
 }
