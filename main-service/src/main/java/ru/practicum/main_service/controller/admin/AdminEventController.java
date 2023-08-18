@@ -36,7 +36,7 @@ public class AdminEventController {
             @RequestParam(name = "states", required = false) EventState states,
             @RequestParam(name = "categories", required = false) List<Long> categoriesId,
             @RequestParam(name = "rangeStart", required = false) String rangeStart,
-                    @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
+            @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
             @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
             @RequestParam(name = "size", defaultValue = "10") @Positive Integer size) {
         return eventService.getEventsWithParamsByAdmin(users, states, categoriesId, rangeStart, rangeEnd, from, size);
